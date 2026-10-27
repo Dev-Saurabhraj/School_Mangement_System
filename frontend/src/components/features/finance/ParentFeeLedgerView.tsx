@@ -1,4 +1,3 @@
-
 import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -65,12 +64,12 @@ const currency = (amount: number) =>
   new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
   }).format(amount);
 
 const dateLabel = (value: string) => {
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) return '—';
 
   return date.toLocaleDateString('en-IN', {
@@ -83,21 +82,19 @@ const dateLabel = (value: string) => {
 const statusStyle = (status: string) => {
   switch (status.toUpperCase()) {
     case 'PAID':
-      return 'bg-emerald-50 text-emerald-700';
+      return 'bg-accent-green-subtle text-accent-green border border-emerald-500/20';
     case 'PARTIAL':
-      return 'bg-amber-50 text-amber-700';
+      return 'bg-accent-amber-subtle text-accent-amber border border-amber-500/20';
     case 'OVERDUE':
-      return 'bg-red-50 text-red-700';
+      return 'bg-rose-500/10 text-rose-500 border border-rose-500/20';
     case 'CANCELLED':
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-canvas text-muted border border-border';
     default:
-      return 'bg-blue-50 text-blue-700';
+      return 'bg-accent-blue-subtle text-accent-blue border border-sky-500/20';
   }
 };
 
-export const ParentFeeLedgerView: React.FC<
-  ParentFeeLedgerViewProps
-> = ({ user }) => {
+export const ParentFeeLedgerView: React.FC<ParentFeeLedgerViewProps> = ({ user }) => {
   const [children, setChildren] = useState<Child[]>([]);
   const [selectedChildId, setSelectedChildId] = useState('');
   const [feeData, setFeeData] = useState<FeeData | null>(null);
@@ -172,15 +169,13 @@ export const ParentFeeLedgerView: React.FC<
     return () => controller.abort();
   }, [selectedChildId, retryKey]);
 
-  const selectedChild = children.find(
-    (child) => child.id === selectedChildId,
-  );
+  const selectedChild = children.find((child) => child.id === selectedChildId);
 
   if (loadingChildren) {
     return (
-      <div className="flex min-h-64 items-center justify-center gap-3">
-        <RefreshCw className="animate-spin text-blue-600" />
-        <span className="text-gray-600">Loading fee ledger...</span>
+      <div className="flex min-h-64 items-center justify-center gap-3 text-secondary font-medium">
+        <RefreshCw className="animate-spin text-accent-blue" size={20} />
+        <span>Loading fee ledger...</span>
       </div>
     );
   }
@@ -197,83 +192,32 @@ export const ParentFeeLedgerView: React.FC<
   const outstanding =
     feeData?.outstandingDues ??
     invoices.reduce(
-      (sum, invoice) =>
-        sum + Math.max(0, Number(invoice.balanceAmount || 0)),
+      (sum, invoice) => sum + Math.max(0, Number(invoice.balanceAmount || 0)),
       0,
     );
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
+    <div className="space-y-6 pb-8">
+      {/* Header */}
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Fee Ledger
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Welcome{user.name ? `, ${user.name}` : ''}. View invoices,
-            outstanding dues and payment receipts.
+          <h1 className="text-2xl font-bold text-primary tracking-tight">Fee Ledger</h1>
+          <p className="mt-0.5 text-xs text-muted font-medium">
+            Welcome{user.name ? `, ${user.name}` : ''}. View invoices, outstanding dues, and payment receipts.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setRetryKey((value) => value + 1)}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          <RefreshCw size={16} />
-          Refresh
-        </button>
-      </div>
-
-      {error && (
-        <div
-          role="alert"
-          className="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"
-        >
-          <AlertCircle size={20} />
-          <span className="flex-1">{error}</span>
-          <button
-            type="button"
-            onClick={() => setRetryKey((value) => value + 1)}
-            className="font-semibold underline"
-          >
-            Try again
-          </button>
-        </div>
-      )}
-
-      {children.length === 0 && !error && (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
-          <UserRound className="mx-auto mb-3 text-gray-400" size={36} />
-          <h2 className="font-semibold text-gray-900">
-            No linked children found
-          </h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Contact school administration to link your child's account.
-          </p>
-        </div>
-      )}
-
-      {children.length > 0 && (
-        <>
+        <div className="flex items-center gap-3">
           {children.length > 1 && (
-            <div className="max-w-sm">
-              <label
-                htmlFor="parent-fee-child"
-                className="mb-2 block text-sm font-medium text-gray-700"
-              >
-                Select child
-              </label>
+            <div className="inline-flex rounded-2xl border border-border bg-surface p-1 shadow-sm">
               <select
                 id="parent-fee-child"
                 value={selectedChildId}
-                onChange={(event) =>
-                  setSelectedChildId(event.target.value)
-                }
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm"
+                onChange={(e) => setSelectedChildId(e.target.value)}
+                className="bg-transparent px-3 py-1.5 text-xs font-bold text-primary focus:outline-none cursor-pointer"
               >
                 {children.map((child) => (
-                  <option key={child.id} value={child.id}>
+                  <option key={child.id} value={child.id} className="bg-surface text-primary">
                     {child.firstName} {child.lastName}
                   </option>
                 ))}
@@ -281,17 +225,57 @@ export const ParentFeeLedgerView: React.FC<
             </div>
           )}
 
+          <button
+            type="button"
+            onClick={() => setRetryKey((value) => value + 1)}
+            className="inline-flex items-center gap-2 rounded-2xl border border-border bg-surface px-4 py-2 text-xs font-bold text-primary shadow-sm hover:bg-canvas transition-all cursor-pointer active:scale-95"
+          >
+            <RefreshCw size={14} />
+            <span>Refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center gap-3 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-xs font-medium text-rose-600 dark:text-rose-400"
+        >
+          <AlertCircle size={18} />
+          <span className="flex-1">{error}</span>
+          <button
+            type="button"
+            onClick={() => setRetryKey((value) => value + 1)}
+            className="font-bold underline cursor-pointer"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {children.length === 0 && !error && (
+        <div className="rounded-3xl border border-border bg-surface p-10 text-center shadow-card">
+          <UserRound className="mx-auto mb-3 text-muted" size={40} />
+          <h2 className="text-xl font-bold text-primary">No linked children found</h2>
+          <p className="mt-2 text-sm text-secondary max-w-md mx-auto">
+            Contact school administration to link your parent account to your child&apos;s student profile.
+          </p>
+        </div>
+      )}
+
+      {children.length > 0 && (
+        <>
           {selectedChild && (
-            <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4">
-              <div className="rounded-full bg-blue-50 p-3 text-blue-700">
-                <UserRound size={24} />
+            <div className="flex items-center gap-4 rounded-3xl border border-border bg-surface p-5 shadow-card">
+              <div className="rounded-2xl bg-accent-blue-subtle p-3 text-accent-blue">
+                <UserRound size={26} />
               </div>
               <div>
-                <h2 className="font-semibold text-gray-900">
+                <h2 className="text-base font-bold text-primary">
                   {selectedChild.firstName} {selectedChild.lastName}
                 </h2>
                 {selectedChild.admissionNo && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-muted font-medium mt-0.5">
                     Admission No: {selectedChild.admissionNo}
                   </p>
                 )}
@@ -300,153 +284,130 @@ export const ParentFeeLedgerView: React.FC<
           )}
 
           {loadingFees ? (
-            <div className="flex min-h-48 items-center justify-center gap-3">
-              <RefreshCw className="animate-spin text-blue-600" />
-              <span className="text-gray-600">Loading invoices...</span>
+            <div className="flex min-h-48 items-center justify-center gap-3 rounded-3xl border border-border bg-surface text-secondary shadow-card font-medium">
+              <RefreshCw className="animate-spin text-accent-blue" size={20} />
+              <span>Loading fee statements...</span>
             </div>
           ) : feeData ? (
             <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {/* 3 Metric Cards */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-gray-200 bg-white p-5"
+                  className="rounded-3xl border border-border bg-surface p-6 shadow-card flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      Total billed
-                    </span>
-                    <FileText className="text-blue-600" size={20} />
+                    <span className="text-xs font-bold text-muted uppercase tracking-wider">Total Billed</span>
+                    <div className="p-2 rounded-xl bg-accent-blue-subtle text-accent-blue">
+                      <FileText size={18} />
+                    </div>
                   </div>
-                  <p className="mt-3 text-2xl font-bold text-gray-900">
+                  <p className="mt-4 text-3xl font-extrabold text-primary">
                     {currency(totalBilled)}
                   </p>
+                  <p className="mt-1 text-xs text-secondary font-medium">Annual tuition &amp; term fees</p>
                 </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-gray-200 bg-white p-5"
+                  className="rounded-3xl border border-border bg-surface p-6 shadow-card flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      Amount paid
-                    </span>
-                    <CheckCircle2 className="text-emerald-600" size={20} />
+                    <span className="text-xs font-bold text-muted uppercase tracking-wider">Amount Paid</span>
+                    <div className="p-2 rounded-xl bg-accent-green-subtle text-accent-green">
+                      <CheckCircle2 size={18} />
+                    </div>
                   </div>
-                  <p className="mt-3 text-2xl font-bold text-gray-900">
+                  <p className="mt-4 text-3xl font-extrabold text-primary">
                     {currency(totalPaid)}
                   </p>
+                  <p className="mt-1 text-xs text-secondary font-medium">Verified receipts collected</p>
                 </motion.div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-orange-200 bg-orange-50 p-5"
+                  className="rounded-3xl border border-border bg-surface p-6 shadow-card flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-orange-800">
-                      Outstanding dues
-                    </span>
-                    <Wallet className="text-orange-700" size={20} />
+                    <span className="text-xs font-bold text-muted uppercase tracking-wider">Outstanding Dues</span>
+                    <div className="p-2 rounded-xl bg-accent-amber-subtle text-accent-amber">
+                      <Wallet size={18} />
+                    </div>
                   </div>
-                  <p className="mt-3 text-2xl font-bold text-orange-900">
+                  <p className="mt-4 text-3xl font-extrabold text-primary">
                     {currency(outstanding)}
                   </p>
+                  <p className="mt-1 text-xs text-secondary font-medium">Pending balance to clear</p>
                 </motion.div>
               </div>
 
-              <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                <div className="border-b border-gray-100 p-5">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Itemized invoices
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Invoice balances and fee breakdowns from the school.
+              {/* Invoices List */}
+              <section className="overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
+                <div className="border-b border-border p-5">
+                  <h2 className="text-base font-bold text-primary">Itemized Invoices</h2>
+                  <p className="mt-0.5 text-xs text-muted font-medium">
+                    Invoice balances and item breakdowns provided by Delhi Public Academy.
                   </p>
                 </div>
 
                 {invoices.length === 0 ? (
-                  <div className="p-6 text-sm text-gray-500">
-                    No invoices found for this child.
+                  <div className="p-8 text-center text-xs text-muted font-medium">
+                    No invoices found for this student. All dues are clear! 🎉
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-border">
                     {invoices.map((invoice) => (
-                      <div key={invoice.id} className="p-5">
+                      <div key={invoice.id} className="p-6 space-y-4">
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
-                            <h3 className="font-semibold text-gray-900">
-                              {invoice.feeType}
-                            </h3>
-                            <p className="mt-1 text-sm text-gray-500">
-                              Invoice: {invoice.invoiceNumber}
-                            </p>
+                            <h3 className="text-base font-bold text-primary">{invoice.feeType}</h3>
+                            <p className="mt-0.5 text-xs text-muted">Invoice No: {invoice.invoiceNumber}</p>
                           </div>
-                          <span
-                            className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle(invoice.status)}`}
-                          >
+                          <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusStyle(invoice.status)}`}>
                             {invoice.status.replaceAll('_', ' ')}
                           </span>
                         </div>
 
-                        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 p-4 rounded-2xl bg-canvas border border-border">
                           <div>
-                            <p className="text-xs text-gray-500">
-                              Total amount
-                            </p>
-                            <p className="mt-1 font-semibold text-gray-900">
-                              {currency(invoice.totalAmount)}
-                            </p>
+                            <p className="text-[11px] font-bold text-muted uppercase tracking-wider">Total Amount</p>
+                            <p className="mt-1 text-sm font-bold text-primary">{currency(invoice.totalAmount)}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500">
-                              Discount
-                            </p>
-                            <p className="mt-1 font-semibold text-gray-900">
-                              {currency(invoice.discountAmount)}
-                            </p>
+                            <p className="text-[11px] font-bold text-muted uppercase tracking-wider">Discount</p>
+                            <p className="mt-1 text-sm font-bold text-primary">{currency(invoice.discountAmount)}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500">
-                              Paid
-                            </p>
-                            <p className="mt-1 font-semibold text-emerald-700">
-                              {currency(invoice.paidAmount)}
-                            </p>
+                            <p className="text-[11px] font-bold text-muted uppercase tracking-wider">Paid Amount</p>
+                            <p className="mt-1 text-sm font-bold text-accent-green">{currency(invoice.paidAmount)}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500">
-                              Balance
-                            </p>
-                            <p className="mt-1 font-semibold text-orange-700">
-                              {currency(invoice.balanceAmount)}
-                            </p>
+                            <p className="text-[11px] font-bold text-muted uppercase tracking-wider">Remaining Balance</p>
+                            <p className="mt-1 text-sm font-bold text-accent-amber">{currency(invoice.balanceAmount)}</p>
                           </div>
                         </div>
 
-                        <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-                          <CalendarDays size={16} />
-                          Due date: {dateLabel(invoice.dueDate)}
+                        <div className="flex items-center gap-2 text-xs text-secondary font-medium">
+                          <CalendarDays size={15} className="text-muted" />
+                          <span>Due date: {dateLabel(invoice.dueDate)}</span>
                         </div>
 
                         {invoice.items.length > 0 && (
-                          <div className="mt-4 rounded-lg bg-gray-50 p-3">
-                            <h4 className="mb-2 text-sm font-medium text-gray-800">
-                              Fee breakdown
+                          <div className="rounded-2xl bg-canvas border border-border p-4">
+                            <h4 className="mb-2.5 text-xs font-bold text-primary uppercase tracking-wider">
+                              Fee Component Breakdown
                             </h4>
-                            <div className="space-y-2">
+                            <div className="space-y-1.5">
                               {invoice.items.map((item, index) => (
                                 <div
                                   key={`${invoice.id}-${item.name}-${index}`}
-                                  className="flex justify-between gap-3 text-sm"
+                                  className="flex justify-between text-xs font-medium"
                                 >
-                                  <span className="text-gray-600">
-                                    {item.name}
-                                  </span>
-                                  <span className="font-medium text-gray-800">
-                                    {currency(item.amount)}
-                                  </span>
+                                  <span className="text-secondary">{item.name}</span>
+                                  <span className="text-primary font-bold">{currency(item.amount)}</span>
                                 </div>
                               ))}
                             </div>
@@ -454,33 +415,31 @@ export const ParentFeeLedgerView: React.FC<
                         )}
 
                         {invoice.receipts.length > 0 && (
-                          <div className="mt-4">
-                            <h4 className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-800">
-                              <CreditCard size={16} />
-                              Payment receipts
+                          <div className="pt-2">
+                            <h4 className="mb-2.5 flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider">
+                              <CreditCard size={15} className="text-accent-blue" />
+                              Payment Receipts
                             </h4>
                             <div className="space-y-2">
                               {invoice.receipts.map((receipt) => (
                                 <div
                                   key={receipt.id}
-                                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-100 p-3"
+                                  className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-canvas border border-border p-3.5"
                                 >
                                   <div>
-                                    <p className="text-sm font-medium text-gray-800">
-                                      {receipt.receiptNumber || 'Receipt'}
+                                    <p className="text-xs font-bold text-primary">
+                                      {receipt.receiptNumber || 'Official Receipt'}
                                     </p>
-                                    <p className="mt-1 text-xs text-gray-500">
-                                      {receipt.paymentMethod.replaceAll('_', ' ')}
-                                      {' · '}
-                                      {dateLabel(receipt.paidAt)}
+                                    <p className="mt-0.5 text-[11px] text-muted">
+                                      {receipt.paymentMethod.replaceAll('_', ' ')} · {dateLabel(receipt.paidAt)}
                                     </p>
                                     {receipt.transactionRef && (
-                                      <p className="mt-1 text-xs text-gray-500">
-                                        Reference: {receipt.transactionRef}
+                                      <p className="text-[10px] text-secondary font-medium">
+                                        Ref: {receipt.transactionRef}
                                       </p>
                                     )}
                                   </div>
-                                  <span className="font-semibold text-emerald-700">
+                                  <span className="text-xs font-extrabold text-accent-green">
                                     {currency(receipt.amount)}
                                   </span>
                                 </div>
@@ -494,19 +453,16 @@ export const ParentFeeLedgerView: React.FC<
                 )}
               </section>
 
-              <div className="flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
-                <Clock size={18} className="mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-3xl border border-border bg-surface p-4 text-xs text-secondary shadow-card">
+                <Clock size={16} className="mt-0.5 shrink-0 text-accent-blue" />
                 <p>
-                  This page displays the fee records and receipts returned
-                  by the school. Online payment is not enabled here yet;
-                  use only a payment flow explicitly provided by your
-                  school.
+                  This ledger displays official institutional records. To make an online UPI installment or request a duplicate stamp receipt, visit Delhi Public Academy accounts counter.
                 </p>
               </div>
             </>
           ) : (
             !error && (
-              <p className="rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500">
+              <p className="rounded-3xl border border-border bg-surface p-6 text-xs text-muted font-medium shadow-card text-center">
                 Fee details are not available.
               </p>
             )
