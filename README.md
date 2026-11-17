@@ -167,11 +167,13 @@ SchoolHub follows a **Modular Monolith** pattern designed for high cohesion, str
   - Examination schedules, downloadable admit cards, and CBSE term report cards with GPA calculation.
 
 ### 📚 Additional Integrated Utilities
-- **Library Catalog & Circulation**:
-  - Inventory search by Title, Author, Category, and ISBN.
-  - Interactive "Add Book" modal.
-  - "Issue Book" modal with borrowing periods (7, 14, 30 days) and automated stock decrement.
-  - Issued Books Register with one-click "Return Book" restoration.
+- **Library Catalog & Circulation** (persisted per school via `/api/v1/library`):
+  - Server-side catalog search by Title, Author, Category, and ISBN with pagination.
+  - Add, edit, and remove titles (edit/remove restricted to School Admins).
+  - Issue a book by student admission number with borrowing periods (7, 14, 30 days); stock is decremented atomically so the last copy cannot be issued twice.
+  - Borrowing rules: at most 3 books per student, one copy of a title per student, active students only.
+  - Issued Books Register with status filters, overdue tracking, a ₹2/day late fine, and one-click "Return Book".
+  - Students see their own loans and parents their children's; the student is notified in-app when a book is issued.
 - **In-App Messaging & Department Chat**:
   - Real-time conversation threads between faculty leads, administrative desks, and parents.
   - Contact search, delivery timestamps, and online status indicators.
@@ -209,7 +211,7 @@ SchoolHub follows a **Modular Monolith** pattern designed for high cohesion, str
 
 ## 🗄️ Database Schema & Multi-Tenancy
 
-The PostgreSQL database contains **22 normalized models** designed for relational integrity:
+The PostgreSQL database contains **24 normalized models** designed for relational integrity:
 
 ```text
 Platform & Tenancy:
@@ -250,6 +252,10 @@ Communications & Media:
 ├── Announcement         (Notice board circulars with audience filters)
 ├── Notification         (In-app alerts)
 ├── Document             (Cloudflare R2 metadata and file URLs)
+
+Library:
+├── LibraryBook          (Catalog titles, ISBN, category, total & available copies)
+├── BookIssue            (Student loans, due dates, return timestamps, late fines)
 ```
 
 ---
@@ -268,7 +274,8 @@ School_Mangement_System/
 │   │   ├── middleware/         # Auth, Tenant isolation, RBAC, Error, Logging
 │   │   ├── modules/            # Domain modules (auth, schools, academics,
 │   │   │                       # students, teachers, attendance, assignments,
-│   │   │                       # finance, exams, timetable, uploads, reports)
+│   │   │                       # finance, exams, timetable, uploads, reports,
+│   │   │                       # library)
 │   │   ├── utils/              # JWT helpers, API responses, passwords
 │   │   ├── app.ts              # Express configuration & route mounting
 │   │   └── server.ts           # HTTP server bootstrap & graceful shutdown
@@ -431,6 +438,13 @@ VITE_API_BASE_URL="http://localhost:5000/api/v1"
 | `GET`  | `/api/v1/exams` | All Authenticated | Examination schedules & mark entry |
 | `POST` | `/api/v1/uploads` | Authenticated | Upload document/worksheet to Cloudflare R2 |
 | `GET`  | `/api/v1/reports/attendance` | Admin | Attendance analytics & defaulters report |
+| `GET`  | `/api/v1/library/books` | All Authenticated | Search the library catalog (`search`, `category`, `availableOnly`, `page`) |
+| `GET`  | `/api/v1/library/summary` | All Authenticated | Catalog counters, categories, and borrowing policy |
+| `POST` | `/api/v1/library/books` | Admin / Teacher | Add a title to the catalog |
+| `PATCH` / `DELETE` | `/api/v1/library/books/:id` | Admin | Edit or remove a title (blocked while copies are on loan) |
+| `GET`  | `/api/v1/library/issues` | All Authenticated | Issue register (students/parents see only their own loans) |
+| `POST` | `/api/v1/library/issues` | Admin / Teacher | Issue a book to a student by admission number |
+| `POST` | `/api/v1/library/issues/:id/return` | Admin / Teacher | Return a book, restore stock, and compute the late fine |
 
 ---
 

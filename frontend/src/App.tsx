@@ -27,8 +27,8 @@ import { ProfilePage } from './pages/ProfilePage';
 import { StudentSubjectsPage } from './pages/StudentSubjectsPage';
 import { SubjectClassroomPage } from './pages/SubjectClassroomPage';
 import { ExamsPage } from './pages/ExamsPage';
+import { LibraryPage } from './pages/LibraryPage';
 import {
-  LibraryPage,
   MessagesPage,
   ReportsPage,
   SettingsPage,

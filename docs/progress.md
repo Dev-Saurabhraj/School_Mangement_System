@@ -28,6 +28,7 @@
 | **Phase 16** | **Daily Attendance Live Backend Integration** | ✅ Complete | Dynamic class & section selectors, live roll call sheet retrieval (`GET /attendance`), 1-click 'Mark All Present', and persistent batch submission (`POST /attendance`) to PostgreSQL. |
 | **Phase 17** | **Frontend Enterprise Architecture Refactor** | ✅ Complete | Refactored prototype God components (700–1,400 lines) into enterprise layered architecture (`types/`, `services/`, `hooks/` with TanStack React Query, and `components/features/<module>/`). Reduced page orchestrators to < 100 lines with zero compilation errors and full caching. |
 | **Phase 18** | **Pluggable File Storage & Circulars Integration** | ✅ Complete | Built storage abstraction layer (Multer + `LocalStorageProvider` / `S3StorageProvider` + `uploadService`) and live Notice Board (`/announcements`) with circular PDF attachments and role-targeted publishing. |
+| **Phase 18.5** | **Library Catalog & Circulation** | ✅ Complete | New `library` backend module (`LibraryBook`, `BookIssue` models) with tenant-scoped catalog CRUD, atomic issue/return, borrowing limits and late fines; `LibraryPage.tsx` rebuilt on TanStack Query, replacing the in-memory mock. |
 | **Phase 19** | **Weekly Timetables & Class Schedules (Next)** | 🟡 Queued | Connect `TimetablePage.tsx` with period schedules, room allotments, and faculty timetable views. |
 | **Phase 20** | **Digital Homework, Submissions & Grading (Next)** | 🟡 Queued | Teacher homework publisher with worksheets, student PDF uploads via `uploadService`, and grading feedback. |
 | **Phase 21** | **Examinations & CBSE Report Cards (Next)** | 🟡 Queued | Connect `ExamsPage.tsx` (marks entry grid, grading scales, and PDF report cards). |
@@ -122,6 +123,16 @@
 - `GET /dashboard` — School Admin aggregated dashboard
 - `GET /reports/attendance` — Student attendance rate report over date range
 - `GET /reports/fees` — Fee collection breakdown by fee structure
+
+### 13. Library (`/api/v1/library`)
+- `GET    /library/books` — Paginated catalog search by title/author/ISBN and category
+- `GET    /library/summary` — Stock counters, open/overdue issue counts, categories, policy
+- `POST   /library/books` — Add a title (Admin, Teacher)
+- `PATCH  /library/books/:id` — Edit a title or adjust stock (Admin)
+- `DELETE /library/books/:id` — Remove a title with no copies on loan (Admin)
+- `GET    /library/issues` — Issue register, scoped to the viewer for students and parents
+- `POST   /library/issues` — Issue a book by admission number (Admin, Teacher)
+- `POST   /library/issues/:id/return` — Return a book and compute the late fine (Admin, Teacher)
 
 ---
 

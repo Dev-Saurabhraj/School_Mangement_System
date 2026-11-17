@@ -66,7 +66,7 @@ npm install
 # 2. Generate Prisma type-safe client
 npm run prisma:generate
 
-# 3. Push schema to your database (creates all 22 tables)
+# 3. Push schema to your database (creates all tables)
 npm run prisma:push
 
 # 4. Seed sample CBSE classes, demo school, students, and teachers

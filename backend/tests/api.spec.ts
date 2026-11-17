@@ -31,6 +31,16 @@ describe('Central Express API Gateway', () => {
     expect(res.status).toBe(401);
   });
 
+  it('GET /api/v1/library/books - should return 401 when accessed without authentication', async () => {
+    const res = await request(app).get('/api/v1/library/books');
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /api/v1/library/issues - should return 401 when accessed without authentication', async () => {
+    const res = await request(app).post('/api/v1/library/issues').send({});
+    expect(res.status).toBe(401);
+  });
+
   it('GET /api/v1/unknown-route-test - should return 404 for undefined endpoints', async () => {
     const res = await request(app).get('/api/v1/unknown-route-test');
     expect(res.status).toBe(404);

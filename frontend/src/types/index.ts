@@ -12,3 +12,4 @@ export * from './attendance.types';
 export * from './announcement.types';
 export * from './assignment.types';
 export * from './notification.types';
+export * from './library.types';

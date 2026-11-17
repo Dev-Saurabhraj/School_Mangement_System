@@ -697,6 +697,26 @@ async function main() {
     },
   });
 
+  // 13. Seed Library Catalog (idempotent on the per-school ISBN)
+  const libraryBooks = [
+    { title: 'Concepts of Physics (Vol 1)', author: 'H.C. Verma', isbn: '978-8177091878', category: 'Physics', totalCopies: 20 },
+    { title: 'Higher Algebra', author: 'Hall & Knight', isbn: '978-9351762560', category: 'Mathematics', totalCopies: 15 },
+    { title: 'Organic Chemistry', author: 'Morrison & Boyd', isbn: '978-8131704813', category: 'Chemistry', totalCopies: 10 },
+    { title: 'To Kill a Mockingbird', author: 'Harper Lee', isbn: '978-0060935467', category: 'Literature', totalCopies: 12 },
+    { title: 'Introduction to Algorithms', author: 'Cormen, Leiserson, Rivest & Stein', isbn: '978-0262033848', category: 'Computer Science', totalCopies: 8 },
+    { title: 'NCERT Exemplar Class 10 Mathematics', author: 'NCERT', isbn: '978-9350071234', category: 'Mathematics', totalCopies: 25 },
+  ];
+
+  for (const book of libraryBooks) {
+    await prisma.libraryBook.upsert({
+      where: { schoolId_isbn: { schoolId: school.id, isbn: book.isbn } },
+      update: {},
+      create: { ...book, schoolId: school.id, availableCopies: book.totalCopies },
+    });
+  }
+
+  console.log(`✅ Seeded Library Catalog: ${libraryBooks.length} titles`);
+
   console.log('\n🎉 Database Seeding Completed Successfully!\n');
   console.log('====================================================');
   console.log('🔑 TEST LOGIN CREDENTIALS:');

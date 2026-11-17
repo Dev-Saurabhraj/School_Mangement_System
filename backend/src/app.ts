@@ -32,6 +32,7 @@ import path from 'path';
 import { subscriptionRoutes } from './modules/subscriptions/subscriptions.routes.js';
 import { uploadRoutes } from './modules/uploads/uploads.routes.js';
 import { notificationRoutes } from './modules/notifications/notifications.routes.js';
+import { libraryRoutes } from './modules/library/library.routes.js';
 
 export const createApp = (): Express => {
   const app = express();
@@ -94,6 +95,7 @@ export const createApp = (): Express => {
   app.use(`${apiPrefix}/subscriptions`, subscriptionRoutes);
   app.use(`${apiPrefix}/uploads`, uploadRoutes);
   app.use(`${apiPrefix}/notifications`, notificationRoutes);
+  app.use(`${apiPrefix}/library`, libraryRoutes);
   app.use(`${apiPrefix}`, dashboardRoutes); // mounts /admin/dashboard and /dashboard
 
   // 4. Catch-all for undefined routes

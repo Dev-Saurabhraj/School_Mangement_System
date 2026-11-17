@@ -28,6 +28,7 @@ import {
   Clock,
   Sparkles,
   Award,
+  Library,
 } from 'lucide-react';
 
 interface NavItem {
@@ -70,6 +71,7 @@ export const Sidebar: React.FC = () => {
         { name: 'Finance', to: '/finance', icon: DollarSign },
         { name: 'Notice', to: '/announcements', icon: Bell },
         { name: 'Calendar', to: '/calendar', icon: Calendar },
+        { name: 'Library', to: '/library', icon: Library },
       ];
     }
 
@@ -83,6 +85,7 @@ export const Sidebar: React.FC = () => {
         { name: 'Finance', to: '/finance', icon: DollarSign },
         { name: 'Notice', to: '/announcements', icon: Bell },
         { name: 'Calendar', to: '/calendar', icon: Calendar },
+        { name: 'Library', to: '/library', icon: Library },
       ];
     }
 
@@ -94,6 +97,7 @@ export const Sidebar: React.FC = () => {
         { name: 'Exams & Reports', to: '/exams', icon: Award },
         { name: 'Circulars', to: '/announcements', icon: Bell },
         { name: 'Timetable', to: '/timetable', icon: Clock },
+        { name: 'Library', to: '/library', icon: Library },
         { name: 'Messages', to: '/messages', icon: MessageSquare },
       ];
     }
@@ -110,7 +114,7 @@ export const Sidebar: React.FC = () => {
       { name: 'Exams', to: '/exams', icon: Award },
       { name: 'Notice', to: '/announcements', icon: Bell },
       { name: 'Calendar', to: '/calendar', icon: Calendar },
-      { name: 'Library', to: '/library', icon: BookOpen },
+      { name: 'Library', to: '/library', icon: Library },
       { name: 'Message', to: '/messages', icon: MessageSquare },
     ];
   };

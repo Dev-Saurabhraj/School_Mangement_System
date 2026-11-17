@@ -150,6 +150,8 @@ model School {
   announcements   Announcement[]
   documents       Document[]
   auditLogs       AuditLog[]
+  libraryBooks    LibraryBook[]
+  bookIssues      BookIssue[]
 
   @@index([status])
   @@index([code])
@@ -226,6 +228,7 @@ model User {
   createdAnnouncements Announcement[]
   sentNotifications    Notification[]
   auditLogs            AuditLog[]
+  issuedBooks          BookIssue[]
 
   @@index([schoolId])
   @@index([email])
@@ -458,6 +461,7 @@ model Student {
   examResults      ExamResult[]
   feeInvoices      FeeInvoice[]
   feePayments      FeePayment[]
+  bookIssues       BookIssue[]
 
   @@unique([schoolId, admissionNo])
   @@index([schoolId])
@@ -820,4 +824,56 @@ model Document {
   school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@index([schoolId, entityType, entityId])
+}
+
+// ==============================================================================
+// LIBRARY MODELS
+// ==============================================================================
+
+/// A catalogued library title owned by a school tenant
+model LibraryBook {
+  id              String      @id @default(uuid())
+  schoolId        String
+  title           String
+  author          String
+  isbn            String?
+  category        String      @default("General")
+  shelfLocation   String?     // e.g. "Rack B-12"
+  totalCopies     Int         @default(1)
+  availableCopies Int         @default(1)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  school          School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  issues          BookIssue[]
+
+  @@unique([schoolId, isbn])
+  @@index([schoolId, category])
+  @@index([schoolId, title])
+}
+
+/// A single copy of a book lent to a student.
+/// Lifecycle is derived, never stored: returnedAt set => RETURNED,
+/// dueDate in the past => OVERDUE, otherwise ACTIVE.
+model BookIssue {
+  id          String      @id @default(uuid())
+  schoolId    String
+  bookId      String
+  studentId   String
+  issuedById  String?     // Staff user who handed the book over
+  issuedAt    DateTime    @default(now())
+  dueDate     DateTime
+  returnedAt  DateTime?
+  fineAmount  Decimal     @default(0) @db.Decimal(10, 2) // Late fine charged on return
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  school      School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  book        LibraryBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  student     Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  issuedBy    User?       @relation(fields: [issuedById], references: [id], onDelete: SetNull)
+
+  @@index([schoolId, returnedAt, dueDate])
+  @@index([schoolId, studentId])
+  @@index([bookId])
 }
