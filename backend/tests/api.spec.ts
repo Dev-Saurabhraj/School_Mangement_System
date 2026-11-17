@@ -41,6 +41,18 @@ describe('Central Express API Gateway', () => {
     expect(res.status).toBe(401);
   });
 
+  it('GET /api/v1/chat/conversations - should return 401 when accessed without authentication', async () => {
+    const res = await request(app).get('/api/v1/chat/conversations');
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /api/v1/chat/conversations/:id/messages - should return 401 when accessed without authentication', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat/conversations/5b0f0a52-58f1-4d0e-9d58-0a4d0f6f9d11/messages')
+      .send({ body: 'hello' });
+    expect(res.status).toBe(401);
+  });
+
   it('GET /api/v1/unknown-route-test - should return 404 for undefined endpoints', async () => {
     const res = await request(app).get('/api/v1/unknown-route-test');
     expect(res.status).toBe(404);

@@ -13,3 +13,4 @@ export * from './announcement.types';
 export * from './assignment.types';
 export * from './notification.types';
 export * from './library.types';
+export * from './chat.types';

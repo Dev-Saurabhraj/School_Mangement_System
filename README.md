@@ -174,9 +174,12 @@ SchoolHub follows a **Modular Monolith** pattern designed for high cohesion, str
   - Borrowing rules: at most 3 books per student, one copy of a title per student, active students only.
   - Issued Books Register with status filters, overdue tracking, a ₹2/day late fine, and one-click "Return Book".
   - Students see their own loans and parents their children's; the student is notified in-app when a book is issued.
-- **In-App Messaging & Department Chat**:
-  - Real-time conversation threads between faculty leads, administrative desks, and parents.
-  - Contact search, delivery timestamps, and online status indicators.
+- **Parent-Teacher Messaging with Admin Supervision** (persisted via `/api/v1/chat`, live over Socket.io):
+  - Parents choose a teacher from the school directory (their child's subject teachers are listed first) and chat one-to-one.
+  - Teachers reply to the parents who wrote to them; each thread shows which child and class it concerns.
+  - Unread badges in the sidebar, read receipts ("Seen"), typing indicators, online status, and paged message history.
+  - School Admins supervise every conversation read-only, see school-wide counters (active threads, messages awaiting a teacher reply), and can close or reopen a conversation with a reason.
+  - Private by design: only the two participants and the school's admins can read a thread; students have no access, and real-time events are delivered only to sockets with a verified JWT.
 - **Daylight / Night Owl Theme System**:
   - Instant Dark Mode contrast switcher powered by semantic CSS custom properties and `localStorage` persistence.
 
@@ -211,7 +214,7 @@ SchoolHub follows a **Modular Monolith** pattern designed for high cohesion, str
 
 ## 🗄️ Database Schema & Multi-Tenancy
 
-The PostgreSQL database contains **24 normalized models** designed for relational integrity:
+The PostgreSQL database contains **26 normalized models** designed for relational integrity:
 
 ```text
 Platform & Tenancy:
@@ -256,6 +259,10 @@ Communications & Media:
 Library:
 ├── LibraryBook          (Catalog titles, ISBN, category, total & available copies)
 ├── BookIssue            (Student loans, due dates, return timestamps, late fines)
+
+Messaging:
+├── ChatConversation     (One parent-teacher thread: status, unread counters, read receipts)
+├── ChatMessage          (Messages within a conversation)
 ```
 
 ---
@@ -275,7 +282,7 @@ School_Mangement_System/
 │   │   ├── modules/            # Domain modules (auth, schools, academics,
 │   │   │                       # students, teachers, attendance, assignments,
 │   │   │                       # finance, exams, timetable, uploads, reports,
-│   │   │                       # library)
+│   │   │                       # library, chat)
 │   │   ├── utils/              # JWT helpers, API responses, passwords
 │   │   ├── app.ts              # Express configuration & route mounting
 │   │   └── server.ts           # HTTP server bootstrap & graceful shutdown
@@ -445,6 +452,15 @@ VITE_API_BASE_URL="http://localhost:5000/api/v1"
 | `GET`  | `/api/v1/library/issues` | All Authenticated | Issue register (students/parents see only their own loans) |
 | `POST` | `/api/v1/library/issues` | Admin / Teacher | Issue a book to a student by admission number |
 | `POST` | `/api/v1/library/issues/:id/return` | Admin / Teacher | Return a book, restore stock, and compute the late fine |
+| `GET`  | `/api/v1/chat/teachers` | Parent | Teacher directory for starting a conversation |
+| `POST` | `/api/v1/chat/conversations` | Parent | Open (or return the existing) conversation with a teacher |
+| `GET`  | `/api/v1/chat/conversations` | Parent / Teacher / Admin | Own conversations; admins see the whole school |
+| `GET`  | `/api/v1/chat/conversations/:id/messages` | Parent / Teacher / Admin | Message history, newest page first (`before` cursor) |
+| `POST` | `/api/v1/chat/conversations/:id/messages` | Parent / Teacher | Send a message (blocked when the conversation is closed) |
+| `POST` | `/api/v1/chat/conversations/:id/read` | Parent / Teacher | Mark a conversation as read |
+| `GET`  | `/api/v1/chat/unread-count` | Parent / Teacher | Total unread messages for the sidebar badge |
+| `PATCH`| `/api/v1/chat/conversations/:id/status` | Admin | Close or reopen a conversation |
+| `GET`  | `/api/v1/chat/supervision/summary` | Admin | School-wide messaging counters |
 
 ---
 

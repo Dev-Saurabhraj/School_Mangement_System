@@ -14,7 +14,10 @@ const { mockApi, mockUser } = vi.hoisted(() => ({
   mockUser: { current: { id: 'u1', name: 'Admin', role: 'SCHOOL_ADMIN' } },
 }));
 
-vi.mock('../lib/api', () => ({ api: mockApi }));
+vi.mock('../lib/api', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../lib/api')>()),
+  api: mockApi,
+}));
 
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({ user: mockUser.current }),

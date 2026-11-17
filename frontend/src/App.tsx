@@ -28,8 +28,8 @@ import { StudentSubjectsPage } from './pages/StudentSubjectsPage';
 import { SubjectClassroomPage } from './pages/SubjectClassroomPage';
 import { ExamsPage } from './pages/ExamsPage';
 import { LibraryPage } from './pages/LibraryPage';
+import { MessagesPage } from './pages/MessagesPage';
 import {
-  MessagesPage,
   ReportsPage,
   SettingsPage,
 } from './pages/OtherPages';

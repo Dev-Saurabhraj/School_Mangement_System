@@ -152,6 +152,8 @@ model School {
   auditLogs       AuditLog[]
   libraryBooks    LibraryBook[]
   bookIssues      BookIssue[]
+  chatConversations ChatConversation[]
+  chatMessages    ChatMessage[]
 
   @@index([status])
   @@index([code])
@@ -229,6 +231,8 @@ model User {
   sentNotifications    Notification[]
   auditLogs            AuditLog[]
   issuedBooks          BookIssue[]
+  chatMessages         ChatMessage[]
+  closedConversations  ChatConversation[]
 
   @@index([schoolId])
   @@index([email])
@@ -410,6 +414,7 @@ model Teacher {
   classSubjects ClassSubject[]
   timetables    Timetable[]
   assignments   Assignment[]
+  conversations ChatConversation[]
 
   @@unique([schoolId, employeeId])
   @@index([schoolId])
@@ -430,6 +435,7 @@ model Parent {
   school       School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   students     Student[]
+  conversations ChatConversation[]
 
   @@index([schoolId])
 }
@@ -876,4 +882,61 @@ model BookIssue {
   @@index([schoolId, returnedAt, dueDate])
   @@index([schoolId, studentId])
   @@index([bookId])
+}
+
+// ==============================================================================
+// PARENT-TEACHER MESSAGING MODELS
+// ==============================================================================
+
+enum ConversationStatus {
+  OPEN
+  CLOSED // Locked by a school admin; history stays readable, no new messages
+}
+
+/// One private thread between a parent and a teacher of the same school.
+/// School admins can read every thread but are never a participant.
+model ChatConversation {
+  id                 String             @id @default(uuid())
+  schoolId           String
+  parentId           String
+  teacherId          String
+  status             ConversationStatus @default(OPEN)
+  closedById         String?
+  closedReason       String?
+  lastMessageAt      DateTime?
+  lastMessagePreview String?
+  // Per-participant read state, maintained atomically on send / read
+  parentUnreadCount  Int                @default(0)
+  teacherUnreadCount Int                @default(0)
+  parentLastReadAt   DateTime?
+  teacherLastReadAt  DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  school             School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  parent             Parent             @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  teacher            Teacher            @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  closedBy           User?              @relation(fields: [closedById], references: [id], onDelete: SetNull)
+  messages           ChatMessage[]
+
+  @@unique([parentId, teacherId])
+  @@index([schoolId, lastMessageAt])
+  @@index([schoolId, status])
+  @@index([teacherId, lastMessageAt])
+}
+
+model ChatMessage {
+  id             String           @id @default(uuid())
+  schoolId       String
+  conversationId String
+  senderId       String
+  body           String
+  createdAt      DateTime         @default(now())
+
+  school         School           @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User             @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([schoolId, createdAt])
 }

@@ -29,6 +29,7 @@
 | **Phase 17** | **Frontend Enterprise Architecture Refactor** | ✅ Complete | Refactored prototype God components (700–1,400 lines) into enterprise layered architecture (`types/`, `services/`, `hooks/` with TanStack React Query, and `components/features/<module>/`). Reduced page orchestrators to < 100 lines with zero compilation errors and full caching. |
 | **Phase 18** | **Pluggable File Storage & Circulars Integration** | ✅ Complete | Built storage abstraction layer (Multer + `LocalStorageProvider` / `S3StorageProvider` + `uploadService`) and live Notice Board (`/announcements`) with circular PDF attachments and role-targeted publishing. |
 | **Phase 18.5** | **Library Catalog & Circulation** | ✅ Complete | New `library` backend module (`LibraryBook`, `BookIssue` models) with tenant-scoped catalog CRUD, atomic issue/return, borrowing limits and late fines; `LibraryPage.tsx` rebuilt on TanStack Query, replacing the in-memory mock. |
+| **Phase 18.6** | **Parent-Teacher Messaging & Admin Supervision** | ✅ Complete | New `chat` backend module (`ChatConversation`, `ChatMessage` models) with participant-scoped threads, unread counters, read receipts and admin close/reopen; live delivery over Socket.io to JWT-verified sockets only; `MessagesPage.tsx` rebuilt on TanStack Query, replacing the in-memory mock. |
 | **Phase 19** | **Weekly Timetables & Class Schedules (Next)** | 🟡 Queued | Connect `TimetablePage.tsx` with period schedules, room allotments, and faculty timetable views. |
 | **Phase 20** | **Digital Homework, Submissions & Grading (Next)** | 🟡 Queued | Teacher homework publisher with worksheets, student PDF uploads via `uploadService`, and grading feedback. |
 | **Phase 21** | **Examinations & CBSE Report Cards (Next)** | 🟡 Queued | Connect `ExamsPage.tsx` (marks entry grid, grading scales, and PDF report cards). |
@@ -133,6 +134,18 @@
 - `GET    /library/issues` — Issue register, scoped to the viewer for students and parents
 - `POST   /library/issues` — Issue a book by admission number (Admin, Teacher)
 - `POST   /library/issues/:id/return` — Return a book and compute the late fine (Admin, Teacher)
+
+### 14. Parent-Teacher Messaging (`/api/v1/chat`)
+- `GET   /chat/teachers` — Teacher directory for parents, the child's teachers first
+- `POST  /chat/conversations` — Parent opens a conversation with a teacher (one per pair)
+- `GET   /chat/conversations` — Own conversations; school admins see all
+- `GET   /chat/conversations/:id/messages` — Cursor-paginated history
+- `POST  /chat/conversations/:id/messages` — Send a message (participants only)
+- `POST  /chat/conversations/:id/read` — Mark as read
+- `GET   /chat/unread-count` — Unread total for the signed-in parent or teacher
+- `PATCH /chat/conversations/:id/status` — Close or reopen (Admin)
+- `GET   /chat/supervision/summary` — Oversight counters (Admin)
+- Socket.io events: `chat:message`, `chat:read`, `chat:conversation`, `chat:typing`
 
 ---
 

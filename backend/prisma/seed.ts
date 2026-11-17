@@ -717,6 +717,42 @@ async function main() {
 
   console.log(`✅ Seeded Library Catalog: ${libraryBooks.length} titles`);
 
+  // 14. Seed a sample Parent-Teacher conversation (only when the pair has none yet)
+  const existingConversation = await prisma.chatConversation.findUnique({
+    where: { parentId_teacherId: { parentId: parent.id, teacherId: teacher.id } },
+  });
+
+  if (!existingConversation) {
+    const firstAt = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const replyAt = new Date(Date.now() - 60 * 60 * 1000);
+    const reply =
+      'Good afternoon! Rahul is doing well. A little more practice on quadratic equations will help.';
+
+    await prisma.chatConversation.create({
+      data: {
+        schoolId: school.id,
+        parentId: parent.id,
+        teacherId: teacher.id,
+        lastMessageAt: replyAt,
+        lastMessagePreview: reply,
+        parentUnreadCount: 1,
+        teacherLastReadAt: replyAt,
+        messages: {
+          create: [
+            {
+              schoolId: school.id,
+              senderId: parentUser.id,
+              body: 'Good afternoon sir, how is Rahul coping with Mathematics this term?',
+              createdAt: firstAt,
+            },
+            { schoolId: school.id, senderId: teacherUser.id, body: reply, createdAt: replyAt },
+          ],
+        },
+      },
+    });
+    console.log('✅ Seeded sample Parent-Teacher conversation');
+  }
+
   console.log('\n🎉 Database Seeding Completed Successfully!\n');
   console.log('====================================================');
   console.log('🔑 TEST LOGIN CREDENTIALS:');

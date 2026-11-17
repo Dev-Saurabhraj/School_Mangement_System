@@ -11,3 +11,4 @@ export * from './useAcademics';
 export * from './useDashboard';
 export * from './useAnnouncements';
 export * from './useLibrary';
+export * from './useChat';

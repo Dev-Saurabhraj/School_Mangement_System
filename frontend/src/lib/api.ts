@@ -15,6 +15,17 @@ export const api = axios.create({
   },
 });
 
+/**
+ * Human-readable reason for a failed request. The API reports errors as
+ * `{ success: false, error: { code, message } }`.
+ */
+export const getApiErrorMessage = (error: unknown, fallback: string): string => {
+  const data = (error as { response?: { data?: { error?: { message?: unknown }; message?: unknown } } })
+    ?.response?.data;
+  const message = data?.error?.message ?? data?.message;
+  return typeof message === 'string' && message ? message : fallback;
+};
+
 // Interceptor to attach Authorization Bearer header if token is stored in memory / local storage
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('schoolhub_token');

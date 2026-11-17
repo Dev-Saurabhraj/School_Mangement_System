@@ -108,6 +108,7 @@ After running `npm run prisma:seed`, you can log in with any of these pre-config
 | **School Admin** | `admin@dpa.edu` | `Admin@Secure123!` | Full School Tenant Operations, Academics, Fees, Attendance |
 | **Teacher** | `amit.sharma@dpa.edu` | `Teacher@Secure123!` | Teacher Dashboard, Class Subjects, Attendance roll call |
 | **Student** | `rahul.sharma@dpa.edu` | `Student@Secure123!` | Student Dashboard, Homework submissions, Fee dues, Report cards |
+| **Parent** | `parent@school.com` | `Parent@123` | Parent Dashboard, Fee Ledger, Library loans, Messages with teachers |
 | **Super Admin** | `superadmin@platform.com` | `SuperAdmin@Secure123!` | Platform SaaS metrics, School provisioning, Subscriptions |
 
 ---

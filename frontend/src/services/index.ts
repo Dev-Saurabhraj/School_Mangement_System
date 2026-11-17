@@ -19,3 +19,4 @@ export * from './subscription.service';
 export * from './assignment.service';
 export * from './notification.service';
 export * from './library.service';
+export * from './chat.service';

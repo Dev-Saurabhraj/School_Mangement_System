@@ -9,6 +9,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
+import { useChatUnreadCount } from '../../hooks/useChat';
 import { cn } from '../../lib/utils';
 import {
   LayoutDashboard,
@@ -35,11 +36,16 @@ interface NavItem {
   name: string;
   to: string;
   icon: React.ComponentType<{ className?: string }>;
+  /** Unread counter shown on the right of the item. */
+  badge?: number;
 }
 
 export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
+  const { data: unreadMessages = 0 } = useChatUnreadCount(
+    user?.role === 'PARENT' || user?.role === 'TEACHER',
+  );
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -72,6 +78,7 @@ export const Sidebar: React.FC = () => {
         { name: 'Notice', to: '/announcements', icon: Bell },
         { name: 'Calendar', to: '/calendar', icon: Calendar },
         { name: 'Library', to: '/library', icon: Library },
+        { name: 'Messages', to: '/messages', icon: MessageSquare, badge: unreadMessages },
       ];
     }
 
@@ -98,7 +105,7 @@ export const Sidebar: React.FC = () => {
         { name: 'Circulars', to: '/announcements', icon: Bell },
         { name: 'Timetable', to: '/timetable', icon: Clock },
         { name: 'Library', to: '/library', icon: Library },
-        { name: 'Messages', to: '/messages', icon: MessageSquare },
+        { name: 'Messages', to: '/messages', icon: MessageSquare, badge: unreadMessages },
       ];
     }
 
@@ -115,7 +122,7 @@ export const Sidebar: React.FC = () => {
       { name: 'Notice', to: '/announcements', icon: Bell },
       { name: 'Calendar', to: '/calendar', icon: Calendar },
       { name: 'Library', to: '/library', icon: Library },
-      { name: 'Message', to: '/messages', icon: MessageSquare },
+      { name: 'Parent Chats', to: '/messages', icon: MessageSquare },
     ];
   };
 
@@ -177,9 +184,16 @@ export const Sidebar: React.FC = () => {
 
                     <span>{item.name}</span>
 
-                    {isActive && (
+                    {item.badge ? (
+                      <span
+                        aria-label={`${item.badge} unread`}
+                        className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-accent-blue text-white leading-none"
+                      >
+                        {item.badge > 9 ? '9+' : item.badge}
+                      </span>
+                    ) : isActive ? (
                       <div className="ml-auto w-1.5 h-1.5 rounded-full bg-accent-blue" />
-                    )}
+                    ) : null}
                   </>
                 )}
               </NavLink>
