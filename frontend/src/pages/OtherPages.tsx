@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSocket, type ChatMessagePayload } from '../context/SocketContext';
 import { reportService } from '../services/report.service';
+import { PreviewBadge } from '../components/ui/PreviewBadge';
 import confetti from 'canvas-confetti';
 import {
   BookOpen,
@@ -239,7 +240,10 @@ export const LibraryPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 flex-wrap">
           <h1 className="text-2xl font-bold text-primary">Library Catalog &amp; Book Issues</h1>
+          <PreviewBadge />
+        </div>
           <p className="text-sm text-secondary">Search library inventory, issue books to students, and track return due dates.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -860,7 +864,10 @@ export const MessagesPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
       <div>
-        <h1 className="text-2xl font-bold text-primary">Messages &amp; In-App Chat</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="text-2xl font-bold text-primary">Messages &amp; In-App Chat</h1>
+          <PreviewBadge />
+        </div>
         <p className="text-sm text-secondary">Collaborate directly with school faculty, department leads, and administrative desks.</p>
       </div>
 
@@ -1162,7 +1169,10 @@ export const SettingsPage: React.FC = () => {
       </AnimatePresence>
 
       <div>
-        <h1 className="text-2xl font-bold text-primary">Platform Settings &amp; Preferences</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="text-2xl font-bold text-primary">Platform Settings &amp; Preferences</h1>
+          <PreviewBadge />
+        </div>
         <p className="text-sm text-secondary">Configure institutional branding, real-time alert dispatchers, security, and daylight contrast.</p>
       </div>
 
