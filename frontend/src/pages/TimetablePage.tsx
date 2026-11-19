@@ -608,7 +608,7 @@ export const TimetablePage: React.FC = () => {
     <div className="space-y-6 max-w-7xl mx-auto">
       {slotSuccess && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2 shadow-sm"
         >
@@ -787,11 +787,9 @@ export const TimetablePage: React.FC = () => {
 
                     return (
                       <td key={idx} className="p-2 align-top">
-                        <motion.div
-                          whileHover={{ scale: 1.02, y: -2 }}
-                          whileTap={{ scale: 0.98 }}
+                        <div
                           onClick={() => setActiveSlot(period)}
-                          className={`p-3.5 rounded-2xl border transition-all cursor-pointer relative shadow-sm hover:shadow-md ${theme.card}`}
+                          className={`p-3.5 rounded-2xl border transition-[box-shadow,border-color] duration-200 cursor-pointer relative shadow-sm hover:shadow-md hover:border-accent-blue/40 ${theme.card}`}
                         >
                           {/* Live pulse for current period */}
                           {isLivePeriod && (
@@ -815,7 +813,7 @@ export const TimetablePage: React.FC = () => {
                               {period.room}
                             </span>
                           </div>
-                        </motion.div>
+                        </div>
                       </td>
                     );
                   })}
@@ -833,9 +831,9 @@ export const TimetablePage: React.FC = () => {
         {activeSlot && (
           <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.98, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              exit={{ scale: 0.98, opacity: 0 }}
               className="bg-surface rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-border space-y-5"
             >
               {/* Header */}
@@ -944,7 +942,7 @@ export const TimetablePage: React.FC = () => {
       {showAddSlotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="w-full max-w-lg bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-2xl space-y-6"
           >

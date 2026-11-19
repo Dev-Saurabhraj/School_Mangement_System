@@ -237,9 +237,9 @@ export const ExamsPage: React.FC = () => {
       <AnimatePresence>
         {toastMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -8 }}
             className={`fixed top-6 right-6 z-50 p-4 rounded-2xl shadow-xl flex items-center gap-3 text-sm font-semibold border ${
               toastMessage.type === 'success'
                 ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -928,7 +928,7 @@ export const ExamsPage: React.FC = () => {
       {showCreateExamModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="w-full max-w-lg bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-2xl space-y-6"
           >
@@ -1050,7 +1050,7 @@ export const ExamsPage: React.FC = () => {
       {showAddSubjectModal && selectedExam && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
+            initial={{ scale: 0.98, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="w-full max-w-lg bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-2xl space-y-6"
           >
