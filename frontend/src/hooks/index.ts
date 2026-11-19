@@ -15,3 +15,4 @@ export * from './useExams';
 export * from './useStudentSubjects';
 export * from './useParent';
 export * from './usePlatform';
+export * from './useAssignments';
