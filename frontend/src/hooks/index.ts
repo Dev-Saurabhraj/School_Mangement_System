@@ -14,3 +14,4 @@ export * from './useTimetable';
 export * from './useExams';
 export * from './useStudentSubjects';
 export * from './useParent';
+export * from './usePlatform';
