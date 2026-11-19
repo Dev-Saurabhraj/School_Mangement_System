@@ -26,7 +26,12 @@ router.use(authenticate, requireTenant);
 // Read endpoints accessible by School Admins and Teachers
 router.get('/years', AcademicsController.listAcademicYears);
 router.get('/classes', AcademicsController.listClasses);
-router.get('/classes/:id', AcademicsController.getClassById);
+// Class detail includes the enrolled student roster — staff only
+router.get(
+  '/classes/:id',
+  requireRoles(UserRole.SCHOOL_ADMIN, UserRole.TEACHER, UserRole.SUPER_ADMIN),
+  AcademicsController.getClassById
+);
 router.get('/subjects', AcademicsController.listSubjects);
 
 // Mutation endpoints restricted to School Admin / Super Admin

@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '../../db/prisma.js';
+import { assertCanAccessStudent, type Requester } from './student-access.js';
 import { AppError } from '../../utils/apiError.js';
 import { hashPassword } from '../../utils/password.js';
 import { CreateStudentInput, UpdateStudentInput } from './students.schema.js';
@@ -204,7 +205,8 @@ export class StudentsService {
    * Get rich detail of a single student (profile, stats, attendance %, fee balances, history)
    * Directly matches Frontend Wireframe Section 11!
    */
-  static async getStudentById(schoolId: string, studentId: string) {
+  static async getStudentById(schoolId: string, studentId: string, requester?: Requester) {
+    await assertCanAccessStudent(schoolId, requester, studentId);
     const student = await prisma.student.findFirst({
       where: { id: studentId, schoolId },
       include: {
