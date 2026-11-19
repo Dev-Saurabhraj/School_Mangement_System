@@ -34,6 +34,9 @@ router.get(
 );
 router.get('/subjects', AcademicsController.listSubjects);
 
+// The signed-in student's own subjects (teacher, periods, rooms) — no roster data
+router.get('/my-subjects', requireRoles(UserRole.STUDENT), AcademicsController.getMySubjects);
+
 // Mutation endpoints restricted to School Admin / Super Admin
 router.post(
   '/years',
