@@ -11,3 +11,5 @@ export * from './useAcademics';
 export * from './useDashboard';
 export * from './useAnnouncements';
 export * from './useTimetable';
+export * from './useExams';
+export * from './useStudentSubjects';
