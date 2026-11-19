@@ -16,3 +16,4 @@ export * from './useStudentSubjects';
 export * from './useParent';
 export * from './usePlatform';
 export * from './useAssignments';
+export * from './useReports';

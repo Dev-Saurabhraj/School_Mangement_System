@@ -14,10 +14,11 @@ export const PLATFORM_KEYS = {
   plans: () => [...PLATFORM_KEYS.all, 'plans'] as const,
 };
 
-export const useSchools = () =>
+export const useSchools = (enabled = true) =>
   useQuery({
     queryKey: PLATFORM_KEYS.schools(),
     queryFn: () => schoolService.listSchools(),
+    enabled,
     staleTime: 1000 * 60 * 2,
   });
 
