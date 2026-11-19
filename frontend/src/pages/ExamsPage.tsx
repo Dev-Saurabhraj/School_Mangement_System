@@ -124,7 +124,9 @@ export const ExamsPage: React.FC = () => {
         setAcademicYears(yearsData);
 
         if (examsData.length > 0) {
-          setSelectedExam(examsData[0]);
+          // Keep already-fetched details (date sheet) if this is the same exam — a repeated
+          // initial load (e.g. StrictMode double effects, Retry) must not wipe them out.
+          setSelectedExam((prev) => (prev?.id === examsData[0].id && prev.subjects ? prev : examsData[0]));
           setMarksExamId(examsData[0].id);
         }
         if (classesData.length > 0) {
@@ -177,7 +179,8 @@ export const ExamsPage: React.FC = () => {
 
   // 3. Load students for marks entry (only for teachers/admins)
   useEffect(() => {
-    if (isStudent || !marksClassId) return;
+    // Roster is only needed (and only permitted) for teachers/admins entering marks
+    if (!isTeacher || !marksClassId) return;
     studentService.getStudents({ classId: marksClassId }).then((students: Student[]) => {
       const roster = students.map((s: Student, idx: number) => ({
         studentId: s.id,
@@ -191,7 +194,7 @@ export const ExamsPage: React.FC = () => {
       setMarksStudents([]);
       showToast('Could not load the student roster for this class.', 'error');
     });
-  }, [marksClassId, isStudent]);
+  }, [marksClassId, isTeacher]);
 
   // Helper: CBSE 9-Point Grading Scale
   const getCbseGrade = (marks: number, max: number = 100) => {

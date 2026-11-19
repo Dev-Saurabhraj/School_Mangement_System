@@ -42,7 +42,8 @@ export const StudentPersonalFeesView: React.FC<StudentPersonalFeesViewProps> = (
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const studentId = user?.studentProfile?.id;
-  const { data: liveInvoices = [], isLoading: isInvoicesLoading } = useInvoices({ studentId });
+  // No `= []` default here: a fresh array each render would retrigger the sync effect below forever
+  const { data: liveInvoices, isLoading: isInvoicesLoading } = useInvoices({ studentId });
   const { mutate: collectPayment, isPending: isProcessingPayment } = useCollectPayment();
 
   // Sync live invoices
